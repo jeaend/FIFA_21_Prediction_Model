@@ -5,19 +5,23 @@ import pandas as pd
 def clean_fifa_data(data):
     data.drop_duplicates()
     data.dropna(axis = 0, how = 'all', inplace = True)
-    data.drop(columns=['ID','NAME', 'JOINED', 'LOAN_DATE_END', 'CONTRACT'],inplace=True)
-
     data.rename(columns=str.upper, inplace=True)
     data.rename(columns=lambda x: x.strip().replace(" ", "_"), inplace=True)    
-
+    data['HITS'] = pd.to_numeric(data['HITS'], errors='coerce')
     data.dropna(subset=['POSITION'], inplace=True)
     data['POSITION'] = data['POSITION'].apply(lambda x: sort_positions(x))
 
-    get_contract_terms(data)
+    #get_contract_terms(data)
     strip_height(data)
     strip_weight(data)
     strip_potential(data)
     convert_monetary_columns_to_m(data)
+    remove_symbol(data)
+
+    data.drop(columns=['ID','NAME', 'JOINED', 'LOAN_DATE_END', 'CONTRACT','TEAM_&_CONTRACT'],inplace=True)
+    data.drop(columns=['HEIGHT','WEIGHT','WAGE','ATTACKING','POSITION','FOOT'],inplace=True)
+    data['BP_INFO'] = data.apply(lambda row: row[row['BP']], axis=1)
+    data.drop(columns=['A/W','D/W','BP','LS','ST','RS','LW','LF','CF','RF','RW','LAM','CAM','RAM','LM','LCM','CM','RCM','RM','LWB','LDM','CDM','RDM','RWB','LB','LCB','CB','RCB','RB','GK'],inplace=True)
     
     return data
 
@@ -69,4 +73,11 @@ def convert_monetary_columns_to_m(data):
     columns = ['VALUE', 'WAGE', 'RELEASE_CLAUSE']
     for column in columns:
         data[column] = data[column].str.replace('€', '').str.replace('M', '').str.replace('K', ' / 1000').map(pd.eval).astype(float)
+    return data
+
+# remove stars
+def remove_symbol(data):
+    columns = ['W/F', 'SM', 'IR']
+    for column in columns:
+        data[column] = data[column].str.extract(r'(\d+)').astype(float).fillna(0).astype(int)
     return data
