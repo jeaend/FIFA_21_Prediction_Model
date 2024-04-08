@@ -2,7 +2,7 @@ from tarfile import data_filter
 import pandas as pd
 
 # cleans fifa dataset 
-def clean_fifa_data(data):
+def clean_fifa_test_data(data):
     data.drop_duplicates()
     data.dropna(axis = 0, how = 'all', inplace = True)
     data.rename(columns=str.upper, inplace=True)
