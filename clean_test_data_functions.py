@@ -23,8 +23,10 @@ def strip_potential(data):
     return data
 
 # helper function to add potential
-# tested it, same model, same metrics 
-def with_potential(data):
-    data['BP_INFO'] = data['BP_INFO'].str.replace('[^\d+-]', '', regex=True)
-    data['BP_INFO'] = pd.to_numeric(data['BP_INFO'], errors='coerce')
-    return data
+# # tested it, same model, same metrics 
+# def with_potential(data):
+#     base_values = data['BP_INFO'].str.extract(r'(\d+)[+-]?\d*').astype(float)
+#     potential_adjustments = data['BP_INFO'].str.extract(r'\d+([+-]?\d*)').astype(float)
+#     data['BP_INFO'] = base_values + potential_adjustments
+#     return data
+
